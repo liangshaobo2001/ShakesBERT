@@ -167,8 +167,10 @@ def calculate_bleu_score(preds,targets, idx2ans):
         
     return np.mean(bleu_per_answer)
 
+## --------------------------------------------------------------------------------------------------
+## Model architecture
 
-
+# This is not used anywhere
 class Embeddings(nn.Module):
     def __init__(self, args):
         super(Embeddings, self).__init__()
@@ -196,7 +198,7 @@ class Embeddings(nn.Module):
 
         return embeddings
 
-
+# This is the image embedding module 
 class Transfer(nn.Module):
     def __init__(self,args):
         super(Transfer, self).__init__()
@@ -217,9 +219,9 @@ class Transfer(nn.Module):
         self.conv7 = nn.Conv2d(64, args.hidden_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
         self.gap7 = nn.AdaptiveAvgPool2d((1,1))
     def forward(self, img):
-        modules2 = list(self.model.children())[:-2]
-        fix2 = nn.Sequential(*modules2)
-        v_2 = self.gap2(self.relu(self.conv2(fix2(img)))).view(-1,self.args.hidden_size)
+        modules2 = list(self.model.children())[:-2] # List resnet152 layers except for the last 2 blocks
+        fix2 = nn.Sequential(*modules2) # Rebuild a neural network with the layers listed in the previous line
+        v_2 = self.gap2(self.relu(self.conv2(fix2(img)))).view(-1,self.args.hidden_size) # Perform a conv-pool block on resnet152[:-2] 
         modules3 = list(self.model.children())[:-3]
         fix3 = nn.Sequential(*modules3)
         v_3 = self.gap3(self.relu(self.conv3(fix3(img)))).view(-1,self.args.hidden_size)
@@ -232,8 +234,9 @@ class Transfer(nn.Module):
         modules7 = list(self.model.children())[:-7]
         fix7 = nn.Sequential(*modules7)
         v_7 = self.gap7(self.relu(self.conv7(fix7(img)))).view(-1,self.args.hidden_size)
-        return v_2, v_3, v_4, v_5, v_7
+        return v_2, v_3, v_4, v_5, v_7 # Returns 5 numbers (because gap is an adaptive average pooling layer and it's output size is (1,1)). There is no v_6 because resnet152[:-6] is a pooling layer, not conv 
 
+# This is a hand-written attention module 
 class MultiHeadedSelfAttention(nn.Module):
     def __init__(self,args):
         super(MultiHeadedSelfAttention,self).__init__()
@@ -266,6 +269,7 @@ class MultiHeadedSelfAttention(nn.Module):
         assert n_dims > 1 and n_dims < len(s)
         return x.view(*s[:-n_dims], -1)
 
+# This is used in BertLayer
 class PositionWiseFeedForward(nn.Module):
     def __init__(self,args):
         super(PositionWiseFeedForward,self).__init__()
@@ -274,6 +278,7 @@ class PositionWiseFeedForward(nn.Module):
     def forward(self, x):
         return self.fc2(gelu(self.fc1(x)))
 
+# This is the "Transformer Encoder". Basically a hand-written small BERT block
 class BertLayer(nn.Module):
     def __init__(self,args, share='all', norm='pre'):
         super(BertLayer, self).__init__()
@@ -325,6 +330,7 @@ class BertLayer(nn.Module):
             out = self.norm2(out + self.drop2(h))
         return out, attn_scores
 
+# This is everything except for the "Classifier" 
 class Transformer(nn.Module):
     def __init__(self, args):
         super(Transformer,self).__init__()
@@ -336,11 +342,11 @@ class Transformer(nn.Module):
         self.blocks = BertLayer(args,share='none', norm='pre')
         self.n_layers = args.n_layers
     def forward(self, img, input_ids, token_type_ids, mask):
-        v_2, v_3, v_4, v_5, v_7 = self.trans(img)
+        v_2, v_3, v_4, v_5, v_7 = self.trans(img) # The image embeddings
         # h = self.embed(input_ids, token_type_ids)
-        h = self.bert_embedding(input_ids=input_ids, token_type_ids=token_type_ids, position_ids=None)
-        for i in range(len(h)):
-            h[i][1] = v_2[i]
+        h = self.bert_embedding(input_ids=input_ids, token_type_ids=token_type_ids, position_ids=None) # This should output a list of embeddings. The parameters are: (question_token, segment_ids, None), that is, a 2-d array (each row representing a batch? not sure), and another 2-d array. Output = 3-d array; dim1 = batch, dim2 = words' embedding vectors, dim3 = actual numbers in the embedding vector).  
+        for i in range(len(h)): # This means looping through sequences in the batch
+            h[i][1] = v_2[i] # This replaces the 2nd embedding in the batch with the image embedding (Why replace? Is this position reserved for the image embedding already?) 
         for i in range(len(h)):
             h[i][2] = v_3[i]
         for i in range(len(h)):
@@ -375,8 +381,9 @@ class Model(nn.Module):
         pooled_h = self.activ1(self.fc1(h.mean(0).mean(1)))
         logits = self.classifier(pooled_h)
         return logits, attn_scores
-    
-    
+
+## End of the model architecture
+## --------------------------------------------------------------------------------------------------
 
 
 def train_one_epoch(loader, model, optimizer, criterion, device, scaler, args, train_df, idx2ans):

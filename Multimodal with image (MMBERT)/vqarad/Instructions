@@ -1,0 +1,2 @@
+utils_vqarad.py contains the model and training functions 
+train_vqarad.py is the script for training 
