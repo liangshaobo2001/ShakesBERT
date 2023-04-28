@@ -69,5 +69,8 @@ for key in inputs.keys():
     torch.save(inputs[key], os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, f"test_{key}.pt"))
 
 # Save the list of test words (ground truths)
-with open(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_labels.txt"), 'w') as f:
-    f.write(str(last_words))
+if not os.path.exists(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH)):
+    os.mkdir(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH))
+with open(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_labels.txt"), 'w') as f:     
+    for word in last_words:
+        f.write(f"{word}\n")
