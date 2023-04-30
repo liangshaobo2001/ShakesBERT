@@ -57,11 +57,17 @@ for sonnet in open(os.path.join(DATA_FOLDER_PATH, RAW_FOLDER_PATH, RAW_TEST_FILE
 # Double that for the max length passed to the tokenizer
 max_len = np.max([l[1] for l in start_end_ids])
 
-# Tokenize the test lines, replace test tokens with [MASK] (id=103)
+# Tokenize the test lines
 inputs = tokenizer(full_texts, max_length=max_len * 2, padding='max_length')
+
+# # Save the ground truth labels (copy of inputs['input_ids'], not masked yet)
+# torch.save(torch.tensor(inputs['input_ids'], dtype=torch.int), 
+#            os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_labels.pt"))
+
+# Replace test tokens with [MASK] (id=103)
 for i in range(len(inputs['input_ids'])):
     start_id, end_id = start_end_ids[i][0], start_end_ids[i][1]
-    inputs['input_ids'][i][start_id:end_id] = [103] * (end_id-start_id)
+    inputs['input_ids'][i][start_id:end_id] = [tokenizer.mask_token_id] * (end_id-start_id)
 
 # Save the individual tensors for testing
 for key in inputs.keys():
@@ -71,6 +77,6 @@ for key in inputs.keys():
 # Save the list of test words (ground truths)
 if not os.path.exists(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH)):
     os.mkdir(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH))
-with open(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_labels.txt"), 'w') as f:     
+with open(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_last_words.txt"), 'w') as f:     
     for word in last_words:
         f.write(f"{word}\n")

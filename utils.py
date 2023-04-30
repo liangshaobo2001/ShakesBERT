@@ -1,5 +1,4 @@
-from datasets import Dataset, load_dataset
-import numpy as np
+from datasets import load_dataset
 import os
 import torch
 from transformers import BertTokenizer
@@ -10,19 +9,25 @@ TRAIN_FOLDER_PATH = "data/train_data_processed"
 def load_test_data():
     """
     Helper function to load test data into a dictionary
-    Pass 'input_ids', 'attention_mask', and 'token_type_ids' to BERT
-    Evaluate model output against 'labels' (ground truths)
+    Pass **output_dict to BERT model
     """
     input_ids = torch.load(os.path.join(TEST_FOLDER_PATH, 'test_input_ids.pt'))
     attention_mask = torch.load(os.path.join(TEST_FOLDER_PATH, 'test_attention_mask.pt'))
     token_type_ids = torch.load(os.path.join(TEST_FOLDER_PATH, 'test_token_type_ids.pt'))
-    with open(os.path.join(TEST_FOLDER_PATH, 'test_labels.txt'), 'r') as f:
-        labels = f.read().splitlines()
+    # labels = torch.load(os.path.join(TEST_FOLDER_PATH, 'test_labels.pt'))
     
-    return {'input_ids':input_ids, 
-            'attention_mask': attention_mask, 
-            'token_type_ids': token_type_ids, 
-            'labels':labels}
+    return {
+        'input_ids':input_ids, 
+        'attention_mask': attention_mask, 
+        'token_type_ids': token_type_ids, 
+        # 'labels': labels
+    }
+
+def load_test_target_words():
+    """ Helper function to load ground truth target words for testing """
+    with open(os.path.join(TEST_FOLDER_PATH, 'test_last_words.txt'), 'r') as f:
+        target_words = f.read().splitlines()
+    return target_words
 
 def load_train_eval_data(train_type, train_prop=.75):
     """
