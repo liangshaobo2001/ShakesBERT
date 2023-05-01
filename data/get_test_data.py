@@ -9,7 +9,7 @@ import torch
 
 DATA_FOLDER_PATH = "data"
 RAW_FOLDER_PATH = "raw_from_DeepSpeare"
-RAW_TEST_FILE = "temp.txt" # MODIFY THIS
+RAW_TEST_FILE = "shakestest.txt" # MODIFY THIS
 PROCESSED_FOLDER_PATH = "test_data_processed"
 END_SYMBOL = "<eos>"
 

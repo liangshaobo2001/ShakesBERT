@@ -7,7 +7,7 @@ import os
 
 DATA_FOLDER_PATH = "data"
 RAW_FOLDER_PATH = "raw_from_DeepSpeare"
-TRAIN_TYPE = "sonnets" # MODIFY THIS
+TRAIN_TYPE = "shakestrain" # MODIFY THIS, can be ['sonnets', 'shakestrain']
 PROCESSED_FOLDER_PATH = "train_data_processed"
 END_SYMBOL = "<eos>"
 
