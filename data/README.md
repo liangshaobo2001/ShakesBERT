@@ -42,8 +42,8 @@ k = 5 # I want top 5 test metrics
 
 results_dict = test_main(model_path, k)
 
-print(f"Top {k} accuracy is {results_dict["accuracy]}")
-print(f"Top {k} cosine similarity score is {results_dict["cossim]}")
-# print(f"Top {k} rhyming score is {results_dict["rhyme]}") # To be implemented
+print(f"Top {k} accuracy is {results_dict["accuracy"]}.")
+print(f"Top {k} cosine similarity score is {results_dict["cossim"]}.")
+# print(f"Top {k} rhyming score is {results_dict["rhyme"]}.") # To be implemented
 ```
 
