@@ -2,4 +2,6 @@
 Bert_base_uncased(BERT)/
 TO DO.txt
 results/
-logs/
+saved_model/
+model.pth
+.ipynb_checkpoints
