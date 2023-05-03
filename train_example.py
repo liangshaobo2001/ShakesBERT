@@ -2,27 +2,20 @@ import torch
 from transformers import BertTokenizer, BertForMaskedLM, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 
 # Replace these lists with your actual dataset
-sentences = ["This is an example sentence from my domain.", "Another example sentence from my domain."]
+# sentences = ["This is an example sentence from my domain.", "Another example sentence from my domain."]
+from utils import load_train_eval_data
+
+# Among the original training data, 75% is used for training, 25% is used for validation
+train_prop = 0.75
+
+# Set the fine-tuning type 
+train_type = "sonnets" # One of ["sonnets", "shakestrain", "poems"]
+
+train_set, val_set = load_train_eval_data(train_type, train_prop)
 
 # Load the tokenizer and the pre-trained model
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 model = BertForMaskedLM.from_pretrained("bert-base-uncased")
-
-# Tokenize the dataset
-inputs = tokenizer(sentences, return_tensors="pt", padding=True, truncation=True, max_length=128)
-
-class CustomDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings):
-        self.encodings = encodings
-
-    def __getitem__(self, idx):
-        return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-
-    def __len__(self):
-        return len(self.encodings["input_ids"])
-
-# Initialize the dataset
-dataset = CustomDataset(inputs)
 
 # Set up the data collator
 data_collator = DataCollatorForLanguageModeling(
@@ -32,6 +25,7 @@ data_collator = DataCollatorForLanguageModeling(
 # Set up the training arguments
 training_args = TrainingArguments(
     output_dir="./results",
+    evaluation_strategy="epoch",
     num_train_epochs=3,
     per_device_train_batch_size=16,
     logging_dir="./logs",
@@ -40,11 +34,13 @@ training_args = TrainingArguments(
     seed=42,
 )
 
+
 # Create the Trainer instance
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=dataset,
+    train_dataset=train_set,
+    eval_dataset=val_set,
     data_collator=data_collator,
 )
 
