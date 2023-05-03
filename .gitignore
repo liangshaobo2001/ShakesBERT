@@ -1,3 +1,7 @@
 .DS_Store
 Bert_base_uncased(BERT)/
 TO DO.txt
+results/
+saved_model/
+model.pth
+.ipynb_checkpoints
