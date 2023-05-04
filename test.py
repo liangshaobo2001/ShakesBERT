@@ -162,6 +162,24 @@ def edit_distance(original_str, new_str):
     
     return difference
 
+def get_topk_related(top_k_preds_words, targets):
+    related_count = 0
+    for t in targets:
+        # Utilizing online rhyming dictionary API
+        related_endpoint = "https://api.datamuse.com/words?ml=" + t
+        related_request = requests.get(related_endpoint)
+        related = related_request.json()
+        related_list = []
+        for word in related:
+            related_list.append(word['word'])
+
+        for word in top_k_preds_words:
+            if word in related_list:
+                related_count += 1
+                break
+
+    return related_count / len(targets)
+
 def test_main(model_path='bert-base-uncased', k=5):
     """
     Main function to call when running the testing procedure. 
