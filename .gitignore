@@ -5,3 +5,4 @@ results/
 saved_model/
 model.pth
 .ipynb_checkpoints
+__pycache__/
