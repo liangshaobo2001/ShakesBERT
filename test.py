@@ -3,9 +3,10 @@ Implements the testing procedure and various cloze task metrics
 """
 
 import torch
+import requests
 from transformers import BertForMaskedLM, BertTokenizer
 from utils import load_test_data, load_test_target_words
- 
+
 
 def get_topk_predictions(model, tokenizer, k=5):
     """
@@ -114,9 +115,52 @@ def get_topk_cossim(model, tokenizer, top_k_preds_ids, targets):
     return cossim_sum / len(targets) # Return average cosine similarity
             
 
-def get_topk_rhyme():
-    # TODO
-    raise NotImplementedError
+def get_topk_rhyme(top_k_preds_words, targets):
+    rhyme_count = 0
+    for t in targets:
+        # Utilizing online rhyming dictionary API
+        perfect_rhymes_endpoint = "https://api.datamuse.com/words?rel_rhy=" + t
+        slant_rhymes_endpoint = "https://api.datamuse.com/words?rel_nry=" + t
+        perfect_rhymes_request = requests.get(perfect_rhymes_endpoint)
+        slant_rhymes_request = requests.get(slant_rhymes_endpoint)
+        perfect_rhymes = perfect_rhymes_request.json()
+        slant_rhymes = slant_rhymes_request.json()
+        rhyme_list = []
+        for rhyme in perfect_rhymes:
+            rhyme_list.append(rhyme['word'])
+        for rhyme in slant_rhymes:
+            rhyme_list.append(rhyme['word'])
+
+        for word in top_k_preds_words:
+            if word in rhyme_list:
+                rhyme_count += 1
+                break
+
+    return rhyme_count / len(targets)
+
+def get_topk_edit_distance(top_k_preds_words, targets):
+    edit_distance_sum = 0
+    for i in range(len(targets)):
+        edit_distance = float('inf')
+        for j in range(len(top_k_preds_words[i])): # across top k predictions
+            edit_distance = min(edit_distance, edit_distance(top_k_preds_words[i][j], targets[i]))
+        edit_distance_sum += edit_distance
+    return edit_distance_sum / len(targets)
+
+def edit_distance(original_str, new_str):
+    difference = 0
+    if len(original_str) > len(new_str):
+        difference = len(original_str) - len(new_str)
+        original_str = original_str[:len(new_str)]
+    elif len(new_str) > len(original_str):
+        difference = len(new_str) - len(original_str)
+        new_str = new_str[:len(original_str)]
+    
+    for i in range(len(original_str)):
+        if original_str[i] != new_str[i]:
+            difference += 1
+    
+    return difference
 
 def test_main(model_path='bert-base-uncased', k=5):
     """
