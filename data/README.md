@@ -18,7 +18,10 @@ train_prop = 0.75
 # Set the fine-tuning type 
 train_type = "sonnets" # One of ["sonnets", "shakestrain", "poems"]
 
-train_set, val_set = load_train_eval_data(train_type, train_prop)
+# Whether we are loading the multi-modal version of training data
+multi_modal = True # If we are passing in multi-modal info, default to False
+
+train_set, val_set = load_train_eval_data(train_type, multi_modal, train_prop)
 
 # PROFIT?
 ```
@@ -31,6 +34,9 @@ Do specify the type of training data to load. There are three possible training 
 3. `"shakestrain"`: (~80% of) all sonnets written by Shakespeare (n=123). 
 
 For an example of using Hugging Face datasets during the training process, see this [Hugging Face tutorial](https://huggingface.co/learn/nlp-course/chapter7/3?fw=pt#fine-tuning-distilbert-with-the-trainer-api). 
+
+Note: When passing in multi-modal information, use the self-defined `utils.CustomDataCollator` instead of the default `DataCollatorForLanguageModeling`. 
+
 
 ## The testing procedure
 
