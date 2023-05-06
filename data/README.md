@@ -9,8 +9,9 @@ The `data/` folder houses all training and test data and their preprocessing scr
 
 ## Load training data
 
-```
-from utils import load_train_eval_data
+```python
+from utils import load_train_eval_data, CustomDataCollator
+from transformers import BertTokenizer, DataCollatorForLanguageModeling
 
 # Among the original training data, 75% is used for training, 25% is used for validation
 train_prop = 0.75
@@ -20,6 +21,14 @@ train_type = "sonnets" # One of ["sonnets", "shakestrain", "poems"]
 
 # Whether we are loading the multi-modal version of training data
 multi_modal = True # If we are passing in multi-modal info, default to False
+
+# Use custom data collator for multi-modal, use default data collator for pure text training
+# The custom data collator only masks the text and leaves out the syllabic info
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+If multi_modal:
+  data_collator = CustomDataCollator(tokenizer=tokenizer, mlm=True, mlm_probability=0.15)
+else: 
+  data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=0.15)
 
 train_set, val_set = load_train_eval_data(train_type, multi_modal, train_prop)
 
@@ -40,7 +49,7 @@ Note: When passing in multi-modal information, use the self-defined `utils.Custo
 
 ## The testing procedure
 
-```
+```python
 from test import test_main
 
 model_path = "I/stored/my/fine-tuned/model/here"
@@ -48,8 +57,8 @@ k = 5 # I want top 5 test metrics
 
 results_dict = test_main(model_path, k)
 
-print(f"Top {k} accuracy is {results_dict["accuracy"]}.")
-print(f"Top {k} cosine similarity score is {results_dict["cossim"]}.")
+print(f"Top {k} accuracy is {results_dict['accuracy']}.")
+print(f"Top {k} cosine similarity score is {results_dict['cossim']}.")
 # print(f"Top {k} rhyming score is {results_dict["rhyme"]}.") # To be implemented
 ```
 
