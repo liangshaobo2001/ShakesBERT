@@ -22,6 +22,8 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 #   3) The test words (answers) 
 full_texts, start_end_ids, last_words = [], [], []
 
+masked_verses = []
+
 # For each sonnet (each line in the raw test file)
 for sonnet in open(os.path.join(DATA_FOLDER_PATH, RAW_FOLDER_PATH, RAW_TEST_FILE), 'r', encoding='utf-8'):
     # Placeholders to store
@@ -36,6 +38,7 @@ for sonnet in open(os.path.join(DATA_FOLDER_PATH, RAW_FOLDER_PATH, RAW_TEST_FILE
             words = stripped.split() # Get individual words in the line
             last_word = words[-1] # Extract the last word
             words[-1] = '_' # Insert a special symbol for start index identification
+            marked_last_word = " ".join(words)
             words.append(last_word)
             marked = " ".join(words)
             start_id = tokenizer.tokenize(marked).index('_') + 1 # Get start index (+1 for [CLS])
@@ -45,12 +48,15 @@ for sonnet in open(os.path.join(DATA_FOLDER_PATH, RAW_FOLDER_PATH, RAW_TEST_FILE
             if prev_full: # If this is not the first verse
                 # Concat the previous verse with the current verse to form a test line
                 full_text_line = prev_full + ' ' + stripped
+                marked_verse = prev_marked + ' ' + stripped
 
                 # Update the placeholders
                 full_texts.append(full_text_line)
                 start_end_ids.append([prev_start_id, prev_end_id])
                 last_words.append(prev_last_word)
+                masked_verses.append(marked_verse)
 
+            prev_marked = marked_last_word
             prev_full, prev_last_word, prev_start_id, prev_end_id = stripped, last_word, start_id, end_id
 
 # Get the maximum number of tokens in each verse
@@ -80,3 +86,7 @@ if not os.path.exists(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH)):
 with open(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_last_words.txt"), 'w') as f:     
     for word in last_words:
         f.write(f"{word}\n")
+
+with open(os.path.join(DATA_FOLDER_PATH, PROCESSED_FOLDER_PATH, "test_masked_verses.txt"), 'w') as f:     
+    for verse in masked_verses:
+        f.write(f"{verse}\n")

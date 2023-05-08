@@ -50,7 +50,7 @@ Note: When passing in multi-modal information, use the self-defined `utils.Custo
 ## The testing procedure
 
 ```python
-from test import test_main
+from test import test_main, test_get_correct_preds
 
 model_path = "I/stored/my/fine-tuned/model/here"
 k = 5 # I want top 5 test metrics
@@ -60,5 +60,8 @@ results_dict = test_main(model_path, k)
 print(f"Top {k} accuracy is {results_dict['accuracy']}.")
 print(f"Top {k} cosine similarity score is {results_dict['cossim']}.")
 # print(f"Top {k} rhyming score is {results_dict["rhyme"]}.") # To be implemented
+
+# Get the test lines where the model predicts the word correctly
+prompts, correct_preds = test_get_correct_preds(model_path, k)
 ```
 

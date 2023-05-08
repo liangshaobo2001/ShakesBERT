@@ -5,7 +5,7 @@ Implements the testing procedure and various cloze task metrics
 import torch
 import requests
 from transformers import BertForMaskedLM, BertTokenizer
-from utils import load_test_data, load_test_target_words
+from utils import load_test_data, load_test_target_words, load_test_masked_verses
 
 
 def get_topk_predictions(model, tokenizer, k=5):
@@ -52,6 +52,55 @@ def get_topk_predictions(model, tokenizer, k=5):
             line_preds_ids, line_preds_tokens = [None] * k, [None] * k
 
     return topk_k_preds_ids, top_k_preds_words
+
+
+def get_correct_examples(top_k_preds_words, targets, masked_verses):
+    """
+    Helper function to retrieve examples that the model generated correct predictions for
+    Args:
+        top_k_preds_words (list): 2nd output of `get_topk_predictions()`, an embedded list of words. 
+        targets (list): list of target words (ground truths), output of `utils.load_test_target_words()`.
+        masked_verses (list): list of prompts (verses with masked words)
+
+    Returns:
+        results (tuple): The first item is a list of the prompts (verses with masked words),
+                         the second item is a list of the top k predictions. 
+    """
+    prompts, correct_predictions = [], []
+    assert len(top_k_preds_words) == len(targets) # Sanity check
+    for i in range(len(targets)):
+        correct = False
+        for j in range(len(top_k_preds_words[i])):
+            if top_k_preds_words[i][j] == targets[i]:
+                correct = True
+                break
+        if correct:
+            prompts.append(masked_verses[i])
+            correct_predictions.append(top_k_preds_words[i])
+    return prompts, correct_predictions
+
+def test_get_correct_preds(model_path='bert-base-uncased', k=5):
+    """
+    Test function to return prompts and predictions that the model produced successfully
+    Args:
+        model_path (str): path to saved pretrained model. 
+        k (int): metrics are computed over the top k predictions for each target. 
+
+    Returns:
+        results (tuple): The first item is a list of the prompts (verses with masked words),
+                         the second item is a list of the top k predictions. 
+    """
+    masked_verses = load_test_masked_verses()
+    # Fetch pretrained tokenizer (standard) and BERT model (fine-tuned by us)
+    model = BertForMaskedLM.from_pretrained(model_path)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+    # Load predictions (in token ids and words) and targets
+    _, top_k_preds_words = get_topk_predictions(model, tokenizer, k)
+    targets = load_test_target_words()
+
+    return get_correct_examples(top_k_preds_words, targets, masked_verses)
+
 
 def get_topk_accuracy(top_k_preds_words, targets):
     """
@@ -206,4 +255,5 @@ def test_main(model_path='bert-base-uncased', k=5):
 
     return {"accuracy": acc,  "cos_sim": cossim}
 
-print(test_main())
+#print(test_main())
+print(test_get_correct_preds())

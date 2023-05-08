@@ -29,6 +29,12 @@ def load_test_target_words():
         target_words = f.read().splitlines()
     return target_words
 
+def load_test_masked_verses():
+    """ Helper function to load test lines with target word masked """
+    with open(os.path.join(TEST_FOLDER_PATH, 'test_masked_verses.txt'), 'r') as f:
+        masked_verses = f.read().splitlines()
+    return masked_verses
+
 def load_train_eval_data(train_type, multimodal=False, train_prop=.75):
     """
     Helper function to load and split train/eval data as TensorDatasets
