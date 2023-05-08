@@ -1,0 +1,5 @@
+Max Acc: 0.3002680965147453
+Max Acc Iter: 650
+
+Max Cos: 0.5713810920715332
+Max Cos Iter: 1300
