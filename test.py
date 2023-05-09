@@ -250,11 +250,16 @@ def test_main(model_path='bert-base-uncased', k=5):
     topk_k_preds_ids, top_k_preds_words = get_topk_predictions(model, tokenizer, test_dict, k)
     targets = load_test_target_words()
 
+    # Compute metrics
     acc = get_topk_accuracy(top_k_preds_words, targets)
     cossim = get_topk_cossim(model, tokenizer, topk_k_preds_ids, targets)
+    rhyme_stat = get_topk_rhyme(top_k_preds_words, targets)
+    edit_distance = get_topk_edit_distance(top_k_preds_words, targets)
+
+
     #rhyme = get_topk_rhyme() #TODO
 
-    return {"accuracy": acc,  "cos_sim": cossim}
+    return {"accuracy": acc,  "cos_sim": cossim, "rhyme": rhyme_stat, "edit_distance": edit_distance}
 
 #print(test_main())
 #print(test_get_correct_preds())
