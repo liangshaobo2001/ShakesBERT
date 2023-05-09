@@ -8,7 +8,7 @@ from transformers import BertForMaskedLM, BertTokenizer
 from utils import load_test_data, load_test_target_words, load_test_masked_verses
 
 
-def get_topk_predictions(model, tokenizer, k=5):
+def get_topk_predictions(model, tokenizer, test_dict, k=5):
     """
     Get top k predictions for each masked word in between two verses.
     
@@ -22,8 +22,6 @@ def get_topk_predictions(model, tokenizer, k=5):
                             predictions for the masked word of that test line. 
     """
 
-    # Load test data and get model output in logits
-    test_dict = load_test_data()
     with torch.no_grad():
         masked_outputs_logits = model(**test_dict).logits
 
@@ -245,8 +243,11 @@ def test_main(model_path='bert-base-uncased', k=5):
     model = BertForMaskedLM.from_pretrained(model_path)
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
+    # Load test data and get model output in logits
+    test_dict = load_test_data()
+
     # Load predictions (in token ids and words) and targets
-    topk_k_preds_ids, top_k_preds_words = get_topk_predictions(model, tokenizer, k)
+    topk_k_preds_ids, top_k_preds_words = get_topk_predictions(model, tokenizer, test_dict, k)
     targets = load_test_target_words()
 
     acc = get_topk_accuracy(top_k_preds_words, targets)
@@ -256,4 +257,4 @@ def test_main(model_path='bert-base-uncased', k=5):
     return {"accuracy": acc,  "cos_sim": cossim}
 
 #print(test_main())
-print(test_get_correct_preds())
+#print(test_get_correct_preds())
