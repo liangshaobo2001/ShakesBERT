@@ -1,0 +1,11 @@
+Best MM_masked model: "./Archive/shakestrainMM_fromShakestrain/lr1e-7_250epochs_chpt10/checkpoint-1670/" 
+Top 5 accuracy is 0.16085790884718498.
+Top 5 cosine similarity score is 0.46112748980522156.
+
+Best MM_unmasked model: "./Archive/shakestrainMM_fromShakestrain/lr5e-6_200epochs_chpt10/checkpoint-1800/"
+Top 5 accuracy is 0.774798927613941.
+Top 5 cosine similarity score is 0.904574453830719.
+
+Best MM_base_test model: "./final_model_shakestrainMM/"
+Top 5 accuracy is 0.2520107238605898.
+Top 5 cosine similarity score is 0.5321983098983765.
