@@ -19,7 +19,7 @@ def load_test_data():
     return {
         'input_ids':input_ids, 
         'attention_mask': attention_mask, 
-        'token_type_ids': token_type_ids, 
+        'token_type_ids': token_type_ids 
         # 'labels': labels
     }
 

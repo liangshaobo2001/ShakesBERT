@@ -93,8 +93,11 @@ def test_get_correct_preds(model_path='bert-base-uncased', k=5):
     model = BertForMaskedLM.from_pretrained(model_path)
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
+    # Load test data and get model output in logits
+    test_dict = load_test_data()
+
     # Load predictions (in token ids and words) and targets
-    _, top_k_preds_words = get_topk_predictions(model, tokenizer, k)
+    _, top_k_preds_words = get_topk_predictions(model, tokenizer, test_dict, k)
     targets = load_test_target_words()
 
     return get_correct_examples(top_k_preds_words, targets, masked_verses)
