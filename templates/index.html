@@ -1,20 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reverse Sentence</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ShakesBERT</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
 <body>
-    <h1>Reverse Sentence</h1>
-    <form action="/" method="post">
-        <label for="sentence">Enter a sentence:</label>
-        <input type="text" name="sentence" id="sentence" required>
-        <button type="submit">Submit</button>
-    </form>
-    {% if reversed_sentence %}
-        <h2>Reversed Sentence:</h2>
-        <p>{{ reversed_sentence }}</p>
-    {% endif %}
+    <div class="container">
+        <h1>ShakesBERT</h1>
+        <form action="/" method="post" id="reverse-form">
+            <div>
+                <label for="sentence">Enter a sentence:</label>
+                <textarea name="sentence" id="sentence" rows="3" cols="60" required>{{input_sentence}}</textarea>
+            </div>
+
+            <div>
+                <label for="number">Number of top results shown:</label>
+                <input type="number" name="number" id="number" value="{{input_number}}" required>
+            </div>
+
+            <div>
+                <label for="text">Placeholders in your sentence:</label>
+                <input type="text" name="text" id="text" value="{{input_text}}" required>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+        <p id="output-text">
+            {% if returned_sentence %}
+            Predicted: {{ returned_sentence }}
+            {% endif %}
+        </p>
+    </div>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>

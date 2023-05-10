@@ -6,3 +6,4 @@ saved_model/
 model.pth
 .ipynb_checkpoints
 __pycache__/
+final_model*
