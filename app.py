@@ -15,7 +15,7 @@ model.eval()
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return_sentence = None
-    input_sentence = "There _ more life in one of your fair _ \n Than both your poets can in praise devise."
+    input_sentence = "There _ more life in one of your fair _ \nThan both your poets can in praise devise."
     input_number = 5
     input_text = "_"
 
