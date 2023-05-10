@@ -21,7 +21,7 @@
             </div>
 
             <div>
-                <label for="text">Placeholders in your sentence:</label>
+                <label for="text">Placeholders for words-to-be-predicted in your sentence:</label>
                 <input type="text" name="text" id="text" value="{{input_text}}" required>
             </div>
 
@@ -29,10 +29,14 @@
         </form>
         <p id="output-text">
             {% if returned_sentence %}
-            Predicted: {{ returned_sentence }}
+            Predicted:
+            {{ returned_sentence }}
             {% endif %}
         </p>
     </div>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <footer>
+        <p>Author: Sabrina Li: Sabrina.xin.li@gmail.com, Shaobo Liang: shaobo.a.liang@gmail.com, <a href="https://frozenpeak0701.github.io/" target="_blank">Zeyu Ma</a>: ma.zeyu2002@gmail.com, Zihui (Lily) Zhu: zhuzihui.lily@gmail.com</p>
+    </footer>      
 </body>
 </html>
