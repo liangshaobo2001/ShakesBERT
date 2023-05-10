@@ -188,10 +188,10 @@ def get_topk_rhyme(top_k_preds_words, targets):
 def get_topk_edit_distance(top_k_preds_words, targets):
     edit_distance_sum = 0
     for i in range(len(targets)):
-        edit_distance = float('inf')
+        edit_distance_value = float('inf')
         for j in range(len(top_k_preds_words[i])): # across top k predictions
-            edit_distance = min(edit_distance, edit_distance(top_k_preds_words[i][j], targets[i]))
-        edit_distance_sum += edit_distance
+            edit_distance_value = min(edit_distance_value, edit_distance(top_k_preds_words[i][j], targets[i]))
+        edit_distance_sum += edit_distance_value
     return edit_distance_sum / len(targets)
 
 def edit_distance(original_str, new_str):
