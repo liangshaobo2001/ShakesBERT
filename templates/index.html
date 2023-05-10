@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse Sentence</title>
+</head>
+<body>
+    <h1>Reverse Sentence</h1>
+    <form action="/" method="post">
+        <label for="sentence">Enter a sentence:</label>
+        <input type="text" name="sentence" id="sentence" required>
+        <button type="submit">Submit</button>
+    </form>
+    {% if reversed_sentence %}
+        <h2>Reversed Sentence:</h2>
+        <p>{{ reversed_sentence }}</p>
+    {% endif %}
+</body>
+</html>
